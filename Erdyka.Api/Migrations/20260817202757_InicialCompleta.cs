@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Erdyka.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InicialCompleta : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,73 +15,75 @@ namespace Erdyka.Api.Migrations
                 name: "Pedidos",
                 columns: table => new
                 {
-                    PedidoId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NombreCliente = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    FechaPedido = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NombreCliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TelefonoCliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FechaEntrega = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Estado = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Estado = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pedidos", x => x.PedidoId);
+                    table.PrimaryKey("PK_Pedidos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Productos",
                 columns: table => new
                 {
-                    ProductoId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    StockDisponible = table.Column<int>(type: "int", nullable: false)
+                    StockActual = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Productos", x => x.ProductoId);
+                    table.PrimaryKey("PK_Productos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
-                    RolId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NombreRol = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.RolId);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "DetallePedidos",
                 columns: table => new
                 {
-                    DetalleId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PedidoId = table.Column<int>(type: "int", nullable: false),
                     ProductoId = table.Column<int>(type: "int", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    PrecioUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    PrecioUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DetallePersonalizado = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetallePedidos", x => x.DetalleId);
+                    table.PrimaryKey("PK_DetallePedidos", x => x.Id);
                     table.ForeignKey(
                         name: "FK_DetallePedidos_Pedidos_PedidoId",
                         column: x => x.PedidoId,
                         principalTable: "Pedidos",
-                        principalColumn: "PedidoId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DetallePedidos_Productos_ProductoId",
                         column: x => x.ProductoId,
                         principalTable: "Productos",
-                        principalColumn: "ProductoId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -91,38 +91,24 @@ namespace Erdyka.Api.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    UsuarioId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NombreUsuario = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Correo = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    ContrasenaHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Activo = table.Column<bool>(type: "bit", nullable: false),
+                    NombreUsuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Correo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     RolId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Usuarios", x => x.UsuarioId);
+                    table.PrimaryKey("PK_Usuarios", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Usuarios_Roles_RolId",
                         column: x => x.RolId,
                         principalTable: "Roles",
-                        principalColumn: "RolId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "RolId", "NombreRol" },
-                values: new object[,]
-                {
-                    { 1, "Administrador" },
-                    { 2, "Usuario" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Usuarios",
-                columns: new[] { "UsuarioId", "Activo", "ContrasenaHash", "Correo", "NombreUsuario", "RolId" },
-                values: new object[] { 1, true, "Admin123_Temp", "admin@erdyka.com", "ErdykaAdmin", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DetallePedidos_PedidoId",

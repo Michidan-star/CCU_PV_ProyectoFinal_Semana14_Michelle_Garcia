@@ -1,0 +1,52 @@
+﻿@page
+@model Erdyka.Web.Pages.ListaUsuariosModel
+@{
+    ViewData["Title"] = "Lista de Usuarios";
+}
+
+<div class="container mt-4">
+    <h3>Usuarios Registrados en el Sistema</h3>
+
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Model.MensajeError
+        </div>
+    }
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre de Usuario</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.ListaUsuarios.Any())
+            {
+                @foreach (var user in Model.ListaUsuarios)
+                {
+                    <tr>
+                        <td>@user.Id</td>
+                        <td>@user.NombreUsuario</td>
+                        <td>@user.Correo</td>
+                        <td>
+                            <form method="post" asp-page-handler="Eliminar" asp-route-id="@user.Id"
+                                  onsubmit="return confirm('¿Estás seguro de que deseas eliminar a @user.NombreUsuario?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center">No hay usuarios registrados o cargando...</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

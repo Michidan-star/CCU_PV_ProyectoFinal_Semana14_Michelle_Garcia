@@ -1,0 +1,88 @@
+﻿@page
+@model Erdyka.Web.Pages.ProductosModel
+@{
+    ViewData["Title"] = "Gestión de Productos";
+}
+
+<div class="container mt-4">
+    <h3>Gestión de Productos</h3>
+
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Model.MensajeError
+        </div>
+    }
+
+    <!-- Formulario para Crear -->
+    <div class="card p-3 mb-4 shadow-sm">
+        <h5>Agregar Nuevo Producto</h5>
+        <form method="post" asp-page-handler="Crear">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Nombre:</label>
+                    <input asp-for="NuevoProducto.Nombre" class="form-control" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Descripción:</label>
+                    <input asp-for="NuevoProducto.Descripcion" class="form-control" />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Precio:</label>
+                    <input asp-for="NuevoProducto.Precio" type="number" step="0.01" class="form-control" required />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Stock Actual:</label>
+                    <input asp-for="NuevoProducto.StockActual" type="number" class="form-control" required />
+                </div>
+                <div class="col-md-2 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla para Listar, Editar y Eliminar -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock Actual</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.ListaProductos.Any())
+            {
+                @foreach (var prod in Model.ListaProductos)
+                {
+                    <tr>
+                        <td>@prod.Id</td>
+                        <td>@prod.Nombre</td>
+                        <td>@prod.Descripcion</td>
+                        <td>$@prod.Precio</td>
+                        <td>@prod.StockActual</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a asp-page="/EditarProducto" asp-route-id="@prod.Id" class="btn btn-warning btn-sm">Editar</a>
+                                <form method="post" asp-page-handler="Eliminar" asp-route-id="@prod.Id"
+                                      onsubmit="return confirm('¿Deseas eliminar a @prod.Nombre?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">No hay productos registrados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

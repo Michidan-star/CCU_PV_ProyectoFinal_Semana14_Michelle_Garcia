@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Erdyka.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260817081313_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260817202757_InicialCompleta")]
+    partial class InicialCompleta
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,14 +27,17 @@ namespace Erdyka.Api.Migrations
 
             modelBuilder.Entity("Erdyka.Api.Models.DetallePedido", b =>
                 {
-                    b.Property<int>("DetalleId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetalleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Cantidad")
                         .HasColumnType("int");
+
+                    b.Property<string>("DetallePersonalizado")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PedidoId")
                         .HasColumnType("int");
@@ -45,7 +48,7 @@ namespace Erdyka.Api.Migrations
                     b.Property<int>("ProductoId")
                         .HasColumnType("int");
 
-                    b.HasKey("DetalleId");
+                    b.HasKey("Id");
 
                     b.HasIndex("PedidoId");
 
@@ -56,145 +59,119 @@ namespace Erdyka.Api.Migrations
 
             modelBuilder.Entity("Erdyka.Api.Models.Pedido", b =>
                 {
-                    b.Property<int>("PedidoId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PedidoId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Estado")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("FechaEntrega")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("FechaPedido")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("NombreCliente")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelefonoCliente")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("PedidoId");
+                    b.HasKey("Id");
 
                     b.ToTable("Pedidos");
                 });
 
             modelBuilder.Entity("Erdyka.Api.Models.Producto", b =>
                 {
-                    b.Property<int>("ProductoId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductoId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Precio")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("StockDisponible")
+                    b.Property<int>("StockActual")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductoId");
+                    b.HasKey("Id");
 
                     b.ToTable("Productos");
                 });
 
-            modelBuilder.Entity("Erdyka.Api.Models.Rol", b =>
+            modelBuilder.Entity("Rol", b =>
                 {
-                    b.Property<int>("RolId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("NombreRol")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("RolId");
-
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            RolId = 1,
-                            NombreRol = "Administrador"
-                        },
-                        new
-                        {
-                            RolId = 2,
-                            NombreRol = "Usuario"
-                        });
-                });
-
-            modelBuilder.Entity("Erdyka.Api.Models.Usuario", b =>
-                {
-                    b.Property<int>("UsuarioId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UsuarioId"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ContrasenaHash")
+                    b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Correo")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreUsuario")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
-                    b.HasKey("UsuarioId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RolId");
 
                     b.ToTable("Usuarios");
-
-                    b.HasData(
-                        new
-                        {
-                            UsuarioId = 1,
-                            Activo = true,
-                            ContrasenaHash = "Admin123_Temp",
-                            Correo = "admin@erdyka.com",
-                            NombreUsuario = "ErdykaAdmin",
-                            RolId = 1
-                        });
                 });
 
             modelBuilder.Entity("Erdyka.Api.Models.DetallePedido", b =>
                 {
                     b.HasOne("Erdyka.Api.Models.Pedido", "Pedido")
-                        .WithMany("Detalles")
+                        .WithMany("DetallePedidos")
                         .HasForeignKey("PedidoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -210,10 +187,10 @@ namespace Erdyka.Api.Migrations
                     b.Navigation("Producto");
                 });
 
-            modelBuilder.Entity("Erdyka.Api.Models.Usuario", b =>
+            modelBuilder.Entity("Usuario", b =>
                 {
-                    b.HasOne("Erdyka.Api.Models.Rol", "Rol")
-                        .WithMany()
+                    b.HasOne("Rol", "Rol")
+                        .WithMany("Usuarios")
                         .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -223,7 +200,12 @@ namespace Erdyka.Api.Migrations
 
             modelBuilder.Entity("Erdyka.Api.Models.Pedido", b =>
                 {
-                    b.Navigation("Detalles");
+                    b.Navigation("DetallePedidos");
+                });
+
+            modelBuilder.Entity("Rol", b =>
+                {
+                    b.Navigation("Usuarios");
                 });
 #pragma warning restore 612, 618
         }
