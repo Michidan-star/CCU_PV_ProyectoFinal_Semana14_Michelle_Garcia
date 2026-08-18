@@ -3,6 +3,7 @@ using Erdyka.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // 1. Configuración del DbContext con la cadena de conexión definida en appsettings.json
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -28,5 +29,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<Erdyka.Api.Data.AppDbContext>();
+    context.Database.EnsureCreated(); // Crea la base de datos y todas las tablas por la fuerza si no existen
+}
 
 app.Run();

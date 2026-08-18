@@ -6,7 +6,7 @@ builder.Services.AddRazorPages();
 // Registrar HttpClient para consumir la API
 builder.Services.AddHttpClient("ErdykaApi", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7168"); // URL donde corre API
+    client.BaseAddress = new Uri("https://localhost:7168"); // URL donde corre la API
 });
 
 var app = builder.Build();
@@ -20,12 +20,19 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// NUEVO: Redirigir la raíz del sitio web directamente al Login/Registro
+app.MapGet("/", async context =>
+{
+    context.Response.Redirect("/Auth/Login");
+    await Task.CompletedTask;
+});
+
 app.MapRazorPages()
    .WithStaticAssets();
 

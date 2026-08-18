@@ -1,10 +1,15 @@
-﻿public class Usuario
+﻿namespace Erdyka.Api.Models
 {
-    public int Id { get; set; } 
-    public string NombreUsuario { get; set; } = string.Empty;
-    public string Correo { get; set; } = string.Empty;
-    public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
-    public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
-    public int RolId { get; set; }
-    public Rol? Rol { get; set; }
+    public class Usuario
+    {
+        public int Id { get; set; }
+        public string NombreUsuario { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+
+        // Debe ser string para evitar el conflicto de tipos
+        public string PasswordHash { get; set; } = string.Empty;
+
+        public int RolId { get; set; }
+        public Rol? Rol { get; set; }
+    }
 }

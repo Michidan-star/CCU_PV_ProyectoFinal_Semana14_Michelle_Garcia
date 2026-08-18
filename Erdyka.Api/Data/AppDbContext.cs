@@ -31,6 +31,27 @@ namespace Erdyka.Api.Data
             modelBuilder.Entity<DetallePedido>()
                 .Property(d => d.PrecioUnitario)
                 .HasColumnType("decimal(18,2)");
+
+            // Configuración de la relación DetallePedido -> Pedido (Usando DetallePedidos)
+            modelBuilder.Entity<DetallePedido>()
+                .HasOne(d => d.Pedido)
+                .WithMany(p => p.DetallePedidos)
+                .HasForeignKey(d => d.PedidoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuración de la relación DetallePedido -> Producto
+            modelBuilder.Entity<DetallePedido>()
+                .HasOne(d => d.Producto)
+                .WithMany(p => p.DetallesPedido)
+                .HasForeignKey(d => d.ProductoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // NUEVO: Configuración de la relación Usuario -> Rol
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.Rol)
+                .WithMany(r => r.Usuarios)
+                .HasForeignKey(u => u.RolId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

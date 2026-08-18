@@ -1,0 +1,99 @@
+﻿@page
+@model Erdyka.Web.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Acceso al Sistema";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-dark">✨ Bienvenido a Erdyka</h3>
+                <p class="text-muted small">Ingresa a tu cuenta o regístrate para continuar</p>
+            </div>
+
+            <!-- Pestañas de Navegación (Login / Registro) -->
+            <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-pill" id="authTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill fw-semibold py-2" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-pane" type="button" role="tab">Iniciar Sesión</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill fw-semibold py-2" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-pane" type="button" role="tab">Registrarse</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="authTabContent">
+                <!-- PANEL DE LOGIN -->
+                <div class="tab-pane fade show active" id="login-pane" role="tabpanel">
+                    @if (!string.IsNullOrEmpty(Model.MensajeError))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+                            @Model.MensajeError
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold small">Correo Electrónico</label>
+                            <input type="email" asp-for="LoginInput.Correo" class="form-control rounded-3" placeholder="tucorreo@ejemplo.com" required />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold small">Contraseña</label>
+                            <input type="password" asp-for="LoginInput.Password" class="form-control rounded-3" placeholder="••••••••" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold" onclick="window.location.href='/Index'; return false;">Entrar al Sistema</button>
+                    </form>
+                    </div>
+
+                <!-- PANEL DE REGISTRO -->
+                <div class="tab-pane fade" id="register-pane" role="tabpanel">
+                    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show py-2 small" role="alert">
+                            @Model.MensajeExito
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.MensajeErrorRegistro))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+                            @Model.MensajeErrorRegistro
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post" asp-page-handler="Registro">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold small">Nombre de Usuario</label>
+                            <input type="text" asp-for="RegistroInput.NombreUsuario" class="form-control rounded-3" placeholder="Tu nombre" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold small">Correo Electrónico</label>
+                            <input type="email" asp-for="RegistroInput.Correo" class="form-control rounded-3" placeholder="tucorreo@ejemplo.com" />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold small">Contraseña</label>
+                            <input type="password" asp-for="RegistroInput.Password" class="form-control rounded-3" placeholder="Mínimo 6 caracteres" />
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100 py-2 rounded-3 fw-bold">Crear Cuenta Nueva</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const mensajeRegistroExito = "@Model.MensajeExito";
+            const mensajeRegistroError = "@Model.MensajeErrorRegistro";
+
+            if (mensajeRegistroExito || mensajeRegistroError) {
+                var registerTab = new bootstrap.Tab(document.querySelector('#register-tab'));
+                registerTab.show();
+            }
+        });
+    </script>
+}

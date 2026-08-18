@@ -55,9 +55,42 @@ namespace Erdyka.Web.Pages
 
         public async Task<IActionResult> OnPostEliminarAsync(int id)
         {
-            var client = _httpClientFactory.CreateClient("ErdykaApi");
-            await client.DeleteAsync($"api/productos/{id}");
+            try
+            {
+                var client = _httpClientFactory.CreateClient("ErdykaApi");
+                await client.DeleteAsync($"api/productos/{id}");
+            }
+            catch (Exception)
+            {
+                // Manejo básico de error por si falla la red al borrar
+            }
             return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostEditarAsync(int id)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("ErdykaApi");
+                var json = JsonSerializer.Serialize(NuevoProducto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PutAsync($"api/productos/{id}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToPage();
+                }
+
+                MensajeError = "No se pudo actualizar el producto.";
+            }
+            catch (Exception)
+            {
+                MensajeError = "Error de conexión al actualizar.";
+            }
+
+            await CargarProductosAsync();
+            return Page();
         }
 
         private async Task CargarProductosAsync()

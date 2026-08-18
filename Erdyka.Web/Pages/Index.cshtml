@@ -1,55 +1,65 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Inicio - Erdyka";
+    ViewData["Title"] = "Panel Principal";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bienvenida a Erdyka</h1>
-    <p>Sistema de Gestión conectado a la API.</p>
+<div class="p-5 mb-4 rounded-4 shadow-sm bg-pastel-lila border-0">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold text-dark">💜 Sistema de Gestión Erdyka</h1>
+        <p class="fs-5 text-secondary mt-2">
+            Plataforma interactiva para el control de inventario, registro de pedidos personalizados (tazas, camisetas, placas, llaveros, etc.) y rebaja automática de stock.
+        </p>
+        <hr class="my-4 opacity-25">
+        <div class="d-flex gap-3 flex-wrap">
+            <!-- Este botón lleva exclusivamente a la Gestión de Pedidos -->
+            <a asp-page="/Pedidos" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm">
+                📋 Ir a Gestión de Pedidos
+            </a>
+            <!-- Este botón lleva al Catálogo / Inventario de Productos -->
+            <a asp-page="/Productos" class="btn btn-outline-dark btn-lg px-4 fw-semibold">
+                📦 Ver Catálogo y Control de Inventario
+            </a>
+        </div>
+    </div>
 </div>
 
-@if (!string.IsNullOrEmpty(Model.MensajeError))
-{
-    <div class="alert alert-danger" role="alert">
-        @Model.MensajeError
+<div class="row g-4 mt-2">
+    <!-- Tarjeta 1: Pedidos -->
+    <div class="col-md-6">
+        <div class="card card-dashboard h-100 shadow-sm border-0 p-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="fs-1 me-3">📋</div>
+                    <div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Módulo de Pedidos</h4>
+                        <p class="text-muted small mb-0">Numeración automática, estados de pago y detalles personalizados.</p>
+                    </div>
+                </div>
+                <p class="card-text text-secondary">
+                    Registra nuevos pedidos seleccionando al cliente, artículos del catálogo, fecha de entrega y el estado del pago (pendiente, abono o pagado).
+                </p>
+                <a asp-page="/Pedidos" class="btn btn-outline-primary btn-sm fw-semibold mt-2">Acceder a Pedidos &rarr;</a>
+            </div>
+        </div>
     </div>
-}
 
-<div class="row mt-4">
-    <div class="col-md-12">
-        <h3>Lista de Productos desde la API</h3>
-        <table class="table table-striped table-bordered mt-3">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Productos.Any())
-                {
-                    @foreach (var prod in Model.Productos)
-                    {
-                        <tr>
-                            <td>@prod.Id</td>
-                            <td>@prod.Nombre</td>
-                            <td>@prod.Descripcion</td>
-                            <td>$@prod.Precio</td>
-                            <td>@prod.Stock</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5" class="text-center">No hay productos registrados o la API está apagada.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <!-- Tarjeta 2: Inventario / Productos -->
+    <div class="col-md-6">
+        <div class="card card-dashboard h-100 shadow-sm border-0 p-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="fs-1 me-3">📦</div>
+                    <div>
+                        <h4 class="card-title fw-bold text-dark mb-1">Control de Inventario y Catálogo</h4>
+                        <p class="text-muted small mb-0">Rebaja automática y control total de existencias.</p>
+                    </div>
+                </div>
+                <p class="card-text text-secondary">
+                    Visualiza el stock en tiempo real y administra tazas, camisetas, botellas, vinilos y más artículos.
+                </p>
+                <a asp-page="/Productos" class="btn btn-outline-primary btn-sm fw-semibold mt-2">Ver Inventario &rarr;</a>
+            </div>
+        </div>
     </div>
 </div>

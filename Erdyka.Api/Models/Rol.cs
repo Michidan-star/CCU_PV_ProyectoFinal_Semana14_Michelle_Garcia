@@ -1,8 +1,10 @@
-﻿using Erdyka.Api.Models;
-
-public class Rol
+﻿namespace Erdyka.Api.Models
 {
-    public int Id { get; set; } 
-    public string Nombre { get; set; } = string.Empty;
-    public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
+    public class Rol
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty; // Ejemplo: "Administrador", "Vendedor"
+
+        public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
+    }
 }
