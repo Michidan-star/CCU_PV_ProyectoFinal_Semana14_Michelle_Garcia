@@ -49,7 +49,7 @@
                                     </td>
                                     <td class="text-center pe-3">
                                         <!-- Botón Editar con ruta directa por parámetro -->
-                                        <a href="/Admin/CrearUsuario?id=@user.UsuarioId" class="btn btn-sm btn-outline-primary me-1 fw-semibold">
+                                        <a asp-page="./CrearUsuario" asp-route-id="@user.UsuarioId" class="btn btn-sm btn-outline-primary me-1 fw-semibold">
                                             ✏️ Editar
                                         </a>
 

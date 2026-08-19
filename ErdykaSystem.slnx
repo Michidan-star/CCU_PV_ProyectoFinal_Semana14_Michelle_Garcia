@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="Dockerfile.txt" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="Erdyka.Api/Erdyka.Api.csproj" />
   <Project Path="Erdyka.Web/Erdyka.Web.csproj" Id="95a63acf-8adc-4e8b-9a66-5cc6a4388831" />
 </Solution>

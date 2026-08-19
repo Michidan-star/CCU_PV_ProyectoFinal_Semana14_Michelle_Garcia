@@ -13,25 +13,32 @@
                     <h2 class="mb-0">@(esEdicion ? "✏️ Editar Usuario" : "✨ Agregar Nuevo Usuario")</h2>
                 </div>
                 <div class="card-body">
-                    <form method="post" class="mt-3">
-                        <!-- Campo oculto importantísimo para que el sistema sepa qué ID estamos editando -->
-                        <input type="hidden" asp-for="Input.UsuarioId" />
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <!-- Alerta por si la API rechaza el cambio -->
+                    @if (!string.IsNullOrEmpty(Model.MensajeError))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @Model.MensajeError
+                        </div>
+                    }
+
+                    <form method="post" class="mt-3">
+                        <input type="hidden" asp-for="Input.UsuarioId" />
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Nombre de Usuario</label>
-                            <input asp-for="Input.NombreUsuario" class="form-control" placeholder="Ej. Reese" required />
+                            <input asp-for="Input.NombreUsuario" class="form-control" required />
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Correo Electrónico</label>
-                            <input asp-for="Input.Correo" type="email" class="form-control" placeholder="usuario@ejemplo.com" required />
+                            <input asp-for="Input.Correo" type="email" class="form-control" required />
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Contraseña</label>
-                            <input asp-for="Input.Contrasena" type="password" class="form-control" placeholder="••••••••" required />
+                            <input asp-for="Input.Contrasena" type="password" class="form-control" placeholder="Escribe nueva contraseña o déjala así" />
+                            <small class="text-muted">Si no deseas cambiarla, puedes escribir una temporal o dejarla en blanco.</small>
                         </div>
 
                         <div class="mb-3">
