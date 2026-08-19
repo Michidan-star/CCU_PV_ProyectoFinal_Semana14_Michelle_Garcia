@@ -77,11 +77,34 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-page="/Productos">📦 Catálogo y Stock</a>
                         </li>
+
+                        <!-- OPCIÓN EXCLUSIVA PARA EL ADMINISTRADOR (Tú) -->
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <li class="nav-item border-start ps-2 ms-2">
+                                <a class="nav-link text-warning fw-bold" asp-page="/Admin/GestionUsuarios">⚙️ Gestionar Usuarios</a>
+                            </li>
+                        }
                     </ul>
+
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="btn btn-light btn-sm text-purple fw-semibold px-3 py-2 shadow-sm" asp-page="/Auth/Login">🔐 Iniciar Sesión / Registro</a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item d-flex align-items-center me-3 text-white">
+                                <span class="small">Hola, <strong>@(User.Identity != null ? User.Identity.Name : "Usuario")</strong></span>
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" asp-page="/Auth/Logout">
+                                    <button type="submit" class="btn btn-outline-light btn-sm px-3 py-2">Cerrar Sesión</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-light btn-sm text-purple fw-semibold px-3 py-2 shadow-sm" asp-page="/Auth/Login">🔐 Iniciar Sesión / Registro</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -96,7 +119,7 @@
 
     <footer class="border-top footer text-muted text-center py-3 bg-white mt-auto">
         <div class="container">
-            &copy; 2026 - Erdyka Web System - Universidad Castro Carazo
+            &copy; 2026 - Erdyka Web System - Todos los derechos reservados
         </div>
     </footer>
 

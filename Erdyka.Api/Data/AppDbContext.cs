@@ -12,9 +12,8 @@ namespace Erdyka.Api.Data
         public DbSet<Producto> Productos => Set<Producto>();
         public DbSet<Pedido> Pedidos => Set<Pedido>();
         public DbSet<DetallePedido> DetallePedidos => Set<DetallePedido>();
-        public DbSet<Usuario> Usuarios => Set<Usuario>();
-        public DbSet<Rol> Roles => Set<Rol>();
-
+        public DbSet<Rol> Roles { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

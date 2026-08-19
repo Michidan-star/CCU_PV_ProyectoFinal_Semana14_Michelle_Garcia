@@ -1,4 +1,6 @@
-﻿namespace Erdyka.Api.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace Erdyka.Api.DTOs
 {
     public class RegistroDto
     {
@@ -6,10 +8,12 @@
         public string Correo { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty; // Cambiado a string
     }
-
     public class LoginDto
     {
+        [JsonPropertyName("correo")]
         public string Correo { get; set; } = string.Empty;
+
+        [JsonPropertyName("password")]
         public string Password { get; set; } = string.Empty;
     }
 

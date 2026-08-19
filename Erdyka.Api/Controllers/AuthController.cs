@@ -31,16 +31,25 @@ namespace Erdyka.Api.Controllers
                 return BadRequest("El correo ya está registrado.");
             }
 
-            var rolPorDefecto = await _context.Set<Rol>().FirstOrDefaultAsync()
-                                ?? new Rol { Nombre = "Administrador" };
+            // Buscamos un rol por defecto
+            var rolPorDefecto = await _context.Roles.FirstOrDefaultAsync();
+            if (rolPorDefecto == null)
+            {
+                rolPorDefecto = new Rol { NombreRol = "Administrador" };
+                _context.Roles.Add(rolPorDefecto);
+                await _context.SaveChangesAsync();
+            }
 
-            // Usamos un hash seguro o texto plano limpio para evitar bloqueos de bytes
+            // Encriptamos la contraseña con BCrypt
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
             var usuario = new Usuario
             {
                 NombreUsuario = request.NombreUsuario,
                 Correo = request.Correo,
-                PasswordHash = request.Password, // Guardado directo y limpio para pruebas estables
-                Rol = rolPorDefecto
+                ContrasenaHash = passwordHash,
+                RolId = rolPorDefecto.RolId,
+                Activo = true
             };
 
             _context.Usuarios.Add(usuario);
@@ -53,29 +62,40 @@ namespace Erdyka.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto request)
         {
-            if (string.IsNullOrWhiteSpace(request.Correo) || string.IsNullOrWhiteSpace(request.Password))
+            if (request == null || string.IsNullOrWhiteSpace(request.Correo) || string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest("Ingrese correo y contraseña.");
+                return BadRequest(new { mensaje = "Ingrese correo y contraseña." });
             }
 
-            // Buscamos directamente sin includes raros para probar
+            // Usamos FirstOrDefaultAsync de forma totalmente asíncrona y segura
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Correo == request.Correo);
+                .Include(u => u.Rol)
+                .FirstOrDefaultAsync(u => u.Correo == request.Correo && u.Activo);
 
             if (usuario == null)
             {
-                return Unauthorized("El correo no está registrado en la base de datos.");
+                return BadRequest(new { mensaje = "El correo no está registrado o el usuario está inactivo." });
             }
 
-            if (usuario.PasswordHash != request.Password)
+            bool passwordValid = false;
+            try
             {
-                return Unauthorized("La contraseña es incorrecta.");
+                passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, usuario.ContrasenaHash);
+            }
+            catch (Exception)
+            {
+                passwordValid = false;
+            }
+
+            if (!passwordValid)
+            {
+                return BadRequest(new { mensaje = "La contraseña es incorrecta." });
             }
 
             return Ok(new
             {
                 mensaje = $"¡Bienvenido de nuevo, {usuario.NombreUsuario}!",
-                rol = "Administrador"
+                rol = usuario.Rol?.NombreRol ?? "Administrador"
             });
         }
     }

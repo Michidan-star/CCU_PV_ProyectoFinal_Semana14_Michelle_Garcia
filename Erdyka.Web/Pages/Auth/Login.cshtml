@@ -33,18 +33,20 @@
                         </div>
                     }
 
-                    <form method="post">
-                        <div class="mb-3">
-                            <label class="form-label text-secondary fw-semibold small">Correo Electrónico</label>
-                            <input type="email" asp-for="LoginInput.Correo" class="form-control rounded-3" placeholder="tucorreo@ejemplo.com" required />
+                    <form method="post" asp-page-handler="Login">
+                        <div class="form-group mb-3">
+                            <label>Correo Electrónico</label>
+                            <input asp-for="LoginInput.Correo" class="form-control" type="email" required />
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label text-secondary fw-semibold small">Contraseña</label>
-                            <input type="password" asp-for="LoginInput.Password" class="form-control rounded-3" placeholder="••••••••" required />
+
+                        <div class="form-group mb-3">
+                            <label>Contraseña</label>
+                            <input asp-for="LoginInput.Password" class="form-control" type="password" required />
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold" onclick="window.location.href='/Index'; return false;">Entrar al Sistema</button>
+
+                        <button type="submit" class="btn btn-primary w-100">Entrar al Sistema</button>
                     </form>
-                    </div>
+                </div>
 
                 <!-- PANEL DE REGISTRO -->
                 <div class="tab-pane fade" id="register-pane" role="tabpanel">
@@ -86,14 +88,14 @@
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const mensajeRegistroExito = "@Model.MensajeExito";
-            const mensajeRegistroError = "@Model.MensajeErrorRegistro";
+                document.add E ventListener("DOMContentLoaded", function() {
+                const mensajeRegistroExito = "@Model.MensajeExito";
+                const mensajeRegistroError = "@Model.MensajeErrorRegistro";
 
-            if (mensajeRegistroExito || mensajeRegistroError) {
-                var registerTab = new bootstrap.Tab(document.querySelector('#register-tab'));
-                registerTab.show();
-            }
-        });
+                if (mensajeRegistroExito || mensajeRegistroError) {
+            var registerTab = new bootstrap.Tab(document.querySelector('#register-tab'));
+            registerTab.show();
+        }
+            });
     </script>
 }

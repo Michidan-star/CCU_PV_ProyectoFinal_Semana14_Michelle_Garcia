@@ -1,0 +1,83 @@
+﻿@page
+@model Erdyka.Web.Pages.Admin.GestionUsuariosModel
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    int contador = 1; // Inicializamos el contador dinámico en 1
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Gestión de Usuarios del Sistema</h2>
+            <p class="text-muted mb-0">Panel exclusivo para administradores.</p>
+        </div>
+        <!-- Botón para Agregar Usuario Nuevo -->
+        <a asp-page="./CrearUsuario" class="btn btn-pastel-primary fw-semibold px-3 py-2">
+            ✨ Agregar Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- Tabla de Usuarios -->
+    <div class="card card-dashboard shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-3">ID</th>
+                            <th>Nombre de Usuario</th>
+                            <th>Correo Electrónico</th>
+                            <th>Rol</th>
+                            <th class="text-center pe-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Usuarios != null && Model.Usuarios.Count > 0)
+                        {
+                            @foreach (var user in Model.Usuarios)
+                            {
+                                <tr>
+                                    <!-- Mostramos y sumamos 1 al contador dinámico en cada vuelta -->
+                                    <td class="ps-3 fw-bold">@(contador++)</td>
+                                    <td>@user.NombreUsuario</td>
+                                    <td>@user.Correo</td>
+                                    <td>
+                                        <!-- Etiqueta del Rol -->
+                                        <span class="badge @(user.Rol == "Administrador" ? "bg-warning text-dark" : "bg-secondary text-white")">
+                                            @user.Rol
+                                        </span>
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <!-- Botón Editar con ruta directa por parámetro -->
+                                        <a href="/Admin/CrearUsuario?id=@user.UsuarioId" class="btn btn-sm btn-outline-primary me-1 fw-semibold">
+                                            ✏️ Editar
+                                        </a>
+
+                                        <!-- Botón Eliminar -->
+                                        <form method="post" asp-page-handler="Eliminar" asp-route-id="@user.UsuarioId"
+                                              onsubmit="return confirm('¿Estás segura de que deseas eliminar a este usuario?');" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold">
+                                                🗑️ Eliminar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <div class="my-3">
+                                        <p class="fs-5 mb-1">No se encontraron usuarios registrados.</p>
+                                        <p class="small text-secondary">Asegúrate de que la API esté encendida o agrega un usuario nuevo con el botón de arriba.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
