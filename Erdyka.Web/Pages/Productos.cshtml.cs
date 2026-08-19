@@ -22,9 +22,19 @@ namespace Erdyka.Web.Pages
 
         public string MensajeError { get; set; } = string.Empty;
 
-        public async Task OnGetAsync()
+        // Modificado para aceptar el clic de "Editar" desde la tabla y cargar los datos en el formulario
+        public async Task OnGetAsync(int? idParaEditar)
         {
             await CargarProductosAsync();
+
+            if (idParaEditar.HasValue)
+            {
+                var productoEncontrado = ListaProductos.FirstOrDefault(p => p.Id == idParaEditar.Value);
+                if (productoEncontrado != null)
+                {
+                    NuevoProducto = productoEncontrado;
+                }
+            }
         }
 
         public async Task<IActionResult> OnPostCrearAsync()
@@ -35,7 +45,7 @@ namespace Erdyka.Web.Pages
                 var json = JsonSerializer.Serialize(NuevoProducto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync("api/productos", content);
+                var response = await client.PostAsync("productos", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -58,7 +68,7 @@ namespace Erdyka.Web.Pages
             try
             {
                 var client = _httpClientFactory.CreateClient("ErdykaApi");
-                await client.DeleteAsync($"api/productos/{id}");
+                await client.DeleteAsync($"productos/{id}");
             }
             catch (Exception)
             {
@@ -67,22 +77,26 @@ namespace Erdyka.Web.Pages
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostEditarAsync(int id)
+        public async Task<IActionResult> OnPostEditarAsync()
         {
             try
             {
+                // Aseguramos que usamos el ID que viene en el modelo enlazado
+                int id = NuevoProducto.Id;
+
                 var client = _httpClientFactory.CreateClient("ErdykaApi");
                 var json = JsonSerializer.Serialize(NuevoProducto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PutAsync($"api/productos/{id}", content);
+                var response = await client.PutAsync($"productos/{id}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToPage();
                 }
 
-                MensajeError = "No se pudo actualizar el producto.";
+                var errorDetalle = await response.Content.ReadAsStringAsync();
+                MensajeError = $"No se pudo actualizar el producto. (Detalle: {errorDetalle})";
             }
             catch (Exception)
             {
@@ -98,7 +112,7 @@ namespace Erdyka.Web.Pages
             try
             {
                 var client = _httpClientFactory.CreateClient("ErdykaApi");
-                var response = await client.GetAsync("api/productos");
+                var response = await client.GetAsync("productos");
 
                 if (response.IsSuccessStatusCode)
                 {

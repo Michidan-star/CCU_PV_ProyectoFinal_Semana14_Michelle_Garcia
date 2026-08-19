@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Elementos de la solución/">
     <File Path="Dockerfile.txt" />
+    <File Path="InsertarRoles.sql" />
     <File Path="README.md" />
   </Folder>
   <Project Path="Erdyka.Api/Erdyka.Api.csproj" />

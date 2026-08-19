@@ -15,16 +15,19 @@ namespace Erdyka.Web.Pages
             _httpClientFactory = httpClientFactory;
         }
 
+        // Listas para mostrar en la interfaz
         public List<PedidoViewModel> ListaPedidos { get; set; } = new();
+        public List<ProductoViewModel> ListaProductosDisponibles { get; set; } = new();
 
         [BindProperty]
         public PedidoViewModel NuevoPedido { get; set; } = new();
 
         public string MensajeError { get; set; } = string.Empty;
+        public string MensajeExito { get; set; } = string.Empty;
 
         public async Task OnGetAsync()
         {
-            await CargarPedidosAsync();
+            await CargarDatosAsync();
         }
 
         public async Task<IActionResult> OnPostCrearAsync()
@@ -33,31 +36,32 @@ namespace Erdyka.Web.Pages
             {
                 var client = _httpClientFactory.CreateClient("ErdykaApi");
 
-                // Estructura limpia que empaqueta el pedido y el item para tu API
-                var pedidoParaApi = new
+                // Estructura que espera el PedidoCrearDto de tu API
+                var payloadDto = new
                 {
                     nombreCliente = NuevoPedido.NombreCliente,
-                    telefonoCliente = NuevoPedido.TelefonoCliente ?? "N/A",
+                    telefonoCliente = NuevoPedido.TelefonoCliente,
                     fechaEntrega = NuevoPedido.FechaEntrega,
-                    estado = NuevoPedido.Estado,
+                    estado = string.IsNullOrEmpty(NuevoPedido.Estado) ? "Pendiente" : NuevoPedido.Estado,
                     items = new[]
                     {
                         new
                         {
                             productoId = NuevoPedido.ProductoId,
-                            cantidad = NuevoPedido.Cantidad,
+                            cantidad = NuevoPedido.Cantidad <= 0 ? 1 : NuevoPedido.Cantidad,
                             detallePersonalizado = NuevoPedido.DetallePersonalizado ?? string.Empty
                         }
                     }
                 };
 
-                var json = JsonSerializer.Serialize(pedidoParaApi);
+                var json = JsonSerializer.Serialize(payloadDto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync("api/pedidos", content);
+                var response = await client.PostAsync("pedidos", content);
 
                 if (response.IsSuccessStatusCode)
                 {
+                    MensajeExito = "¡Pedido registrado con éxito!";
                     return RedirectToPage();
                 }
 
@@ -66,10 +70,10 @@ namespace Erdyka.Web.Pages
             }
             catch (Exception ex)
             {
-                MensajeError = $"Error al conectar con la API: {ex.Message}";
+                MensajeError = $"Error de conexión con la API: {ex.Message}";
             }
 
-            await CargarPedidosAsync();
+            await CargarDatosAsync();
             return Page();
         }
 
@@ -78,34 +82,46 @@ namespace Erdyka.Web.Pages
             try
             {
                 var client = _httpClientFactory.CreateClient("ErdykaApi");
-                await client.DeleteAsync($"api/pedidos/{id}");
+                await client.DeleteAsync($"pedidos/{id}");
             }
             catch (Exception)
             {
-                // Manejo de error de red al eliminar
+                // Manejo de error silencioso o básico de red al borrar
             }
             return RedirectToPage();
         }
 
-        private async Task CargarPedidosAsync()
+        private async Task CargarDatosAsync()
         {
             try
             {
                 var client = _httpClientFactory.CreateClient("ErdykaApi");
-                var response = await client.GetAsync("api/pedidos");
 
-                if (response.IsSuccessStatusCode)
+                // 1. Cargar Pedidos
+                var responsePedidos = await client.GetAsync("pedidos");
+                if (responsePedidos.IsSuccessStatusCode)
                 {
-                    var jsonString = await response.Content.ReadAsStringAsync();
+                    var jsonString = await responsePedidos.Content.ReadAsStringAsync();
+                    ListaPedidos = JsonSerializer.Deserialize<List<PedidoViewModel>>(jsonString, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new();
+                }
 
-                    // Deserialización flexible ignorando mayúsculas/minúsculas
-                    var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    ListaPedidos = JsonSerializer.Deserialize<List<PedidoViewModel>>(jsonString, opciones) ?? new();
+                // 2. Cargar Productos para el selector del formulario
+                var responseProductos = await client.GetAsync("productos");
+                if (responseProductos.IsSuccessStatusCode)
+                {
+                    var jsonProductos = await responseProductos.Content.ReadAsStringAsync();
+                    ListaProductosDisponibles = JsonSerializer.Deserialize<List<ProductoViewModel>>(jsonProductos, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new();
                 }
             }
             catch (Exception)
             {
-                MensajeError = "No se pudieron cargar los pedidos de la base de datos.";
+                MensajeError = "No se pudieron cargar los datos necesarios.";
             }
         }
     }

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Gestión de Productos";
 }
+
 <div class="container mt-4">
     <h3>Gestión de Productos</h3>
 
@@ -13,10 +14,16 @@
         </div>
     }
 
-    <!-- Formulario para Crear -->
+    <!-- Formulario Dinámico para Crear o Editar -->
     <div class="card p-3 mb-4 shadow-sm">
-        <h5>Agregar Nuevo Producto</h5>
-        <form method="post" asp-page-handler="Crear">
+        <h5>@(Model.NuevoProducto.Id == 0 ? "Agregar Nuevo Producto" : $"Editando Producto ID: {Model.NuevoProducto.Id}")</h5>
+
+        <!-- He cambiado el handler a una ruta dinámica más robusta -->
+        <form method="post" asp-page-handler="@(Model.NuevoProducto.Id == 0 ? "Crear" : "Editar")">
+
+            <!-- Campo oculto para asegurar que el ID siempre se envíe en el POST -->
+            <input type="hidden" asp-for="NuevoProducto.Id" />
+
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Nombre:</label>
@@ -34,15 +41,21 @@
                     <label class="form-label">Stock Actual:</label>
                     <input asp-for="NuevoProducto.StockActual" type="number" class="form-control" required />
                 </div>
-                <div class="col-md-2 mb-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-success w-100">Guardar</button>
+                <div class="col-md-2 mb-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn @(Model.NuevoProducto.Id == 0 ? "btn-success" : "btn-warning") w-100">
+                        @(Model.NuevoProducto.Id == 0 ? "Guardar" : "Actualizar")
+                    </button>
+                    @if (Model.NuevoProducto.Id != 0)
+                    {
+                        <a asp-page="./Productos" class="btn btn-secondary">Cancelar</a>
+                    }
                 </div>
             </div>
         </form>
     </div>
 
     <!-- Tabla para Listar, Editar y Eliminar -->
-    <table class="table table-striped">
+    <table class="table table-striped align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -54,7 +67,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.ListaProductos.Any())
+            @if (Model.ListaProductos != null && Model.ListaProductos.Any())
             {
                 @foreach (var prod in Model.ListaProductos)
                 {
@@ -66,9 +79,12 @@
                         <td>@prod.StockActual</td>
                         <td>
                             <div class="d-flex gap-2">
-                                <a asp-page="./EditarProducto" asp-route-id="@prod.Id" class="btn btn-warning btn-sm">Editar</a>
+                                <!-- Botón para cargar los datos en el formulario de arriba -->
+                                <a asp-page="./Productos" asp-route-idParaEditar="@prod.Id" class="btn btn-warning btn-sm">Editar</a>
+
+                                <!-- Botón para Eliminar directamente -->
                                 <form method="post" asp-page-handler="Eliminar" asp-route-id="@prod.Id"
-                                      onsubmit="return confirm('¿Deseas eliminar a @prod.Nombre?');">
+                                      onsubmit="return confirm('¿Deseas eliminar el producto @prod.Nombre?');" style="margin: 0;">
                                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                 </form>
                             </div>

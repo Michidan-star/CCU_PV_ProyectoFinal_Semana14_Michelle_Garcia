@@ -5,109 +5,126 @@
 }
 
 <div class="container mt-4">
-    <h3>📋 Gestión de Pedidos</h3>
-    <p class="text-muted">Registra los pedidos, controla los estados y descuenta stock automáticamente.</p>
+    <h3>Gestión de Pedidos</h3>
 
     @if (!string.IsNullOrEmpty(Model.MensajeError))
     {
-        <div class="alert alert-danger" role="alert">@Model.MensajeError</div>
+        <div class="alert alert-danger" role="alert">
+            @Model.MensajeError
+        </div>
     }
 
-    <!-- Formulario para Nuevo Pedido -->
-    <div class="card p-4 mb-4 shadow-sm border-0">
-        <h5 class="mb-3">Registrar Nuevo Pedido</h5>
+    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    {
+        <div class="alert alert-success" role="alert">
+            @Model.MensajeExito
+        </div>
+    }
+
+    <!-- Formulario para Registrar Pedido -->
+    <div class="card p-3 mb-4 shadow-sm">
+        <h5>Registrar Nuevo Pedido</h5>
+
         <form method="post" asp-page-handler="Crear">
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold">Nombre del Cliente:</label>
-                    <input asp-for="NuevoPedido.NombreCliente" class="form-control" required placeholder="Ej. María Pérez" />
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold">Teléfono del Cliente:</label>
-                    <input asp-for="NuevoPedido.TelefonoCliente" class="form-control" required placeholder="Ej. 8888-8888" />
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold">ID del Producto (Catálogo):</label>
-                    <input asp-for="NuevoPedido.ProductoId" type="number" class="form-control" required placeholder="ID del producto ej. 1" />
+                    <label class="form-label">Nombre del Cliente:</label>
+                    <input asp-for="NuevoPedido.NombreCliente" class="form-control" required />
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label class="form-label fw-semibold">Cantidad:</label>
-                    <input asp-for="NuevoPedido.Cantidad" type="number" min="1" class="form-control" required />
+                    <label class="form-label">Teléfono:</label>
+                    <input asp-for="NuevoPedido.TelefonoCliente" class="form-control" required />
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label class="form-label fw-semibold">Detalle Personalizado:</label>
-                    <input asp-for="NuevoPedido.DetallePersonalizado" class="form-control" placeholder="Ej. Taza con nombre" />
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label fw-semibold">Fecha de Entrega:</label>
+                    <label class="form-label">Fecha de Entrega:</label>
+                    <!-- Cambiado a type="date" para evitar el error de validación de hora del navegador -->
                     <input asp-for="NuevoPedido.FechaEntrega" type="date" class="form-control" required />
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label fw-semibold">Estado:</label>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Estado:</label>
                     <select asp-for="NuevoPedido.Estado" class="form-select">
                         <option value="Pendiente">Pendiente</option>
-                        <option value="Abono">Abono</option>
-                        <option value="Pagado">Pagado</option>
+                        <option value="En Proceso">En Proceso</option>
+                        <option value="Completado">Completado</option>
                     </select>
                 </div>
-                <div class="col-md-12 mb-3">
-                    <button type="submit" class="btn btn-primary fw-bold px-5">💾 Guardar Pedido (Rebaja Stock Automática)</button>
+            </div>
+
+            <hr />
+            <h6 class="text-muted">Detalle del Producto</h6>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Seleccionar Producto:</label>
+                    <select asp-for="NuevoPedido.ProductoId" class="form-select" required>
+                        <option value="">-- Seleccione un producto --</option>
+                        @foreach (var prod in Model.ListaProductosDisponibles)
+                        {
+                            <option value="@prod.Id">@prod.Nombre (Stock: @prod.StockActual - $@prod.Precio)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Cantidad:</label>
+                    <input asp-for="NuevoPedido.Cantidad" type="number" min="1" class="form-control" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Detalle Personalizado (Notas):</label>
+                    <input asp-for="NuevoPedido.DetallePersonalizado" class="form-control" placeholder="Ej. Sin azúcar, extra frío..." />
+                </div>
+                <div class="col-md-2 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">Guardar Pedido</button>
                 </div>
             </div>
         </form>
     </div>
 
-    <!-- Tabla de Pedidos Registrados -->
-    <div class="card p-3 shadow-sm border-0">
-        <h5 class="mb-3">Lista de Pedidos Activos</h5>
-        <table class="table table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>N° Pedido</th>
-                    <th>Cliente</th>
-                    <th>Teléfono</th>
-                    <th>Fecha Creación</th>
-                    <th>Entrega</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.ListaPedidos.Any())
-                {
-                    @foreach (var ped in Model.ListaPedidos)
-                    {
-                        <tr>
-                            <td><strong>#@ped.Id</strong></td>
-                            <td>@ped.NombreCliente</td>
-                            <td>@ped.TelefonoCliente</td>
-                            <td>@ped.FechaCreacion.ToShortDateString()</td>
-                            <td>@ped.FechaEntrega.ToShortDateString()</td>
-                            <td>$@ped.Total</td>
-                            <td>
-                                <span class="badge @(ped.Estado == "Pagado" ? "bg-success" : ped.Estado == "Abono" ? "bg-warning text-dark" : "bg-danger")">
-                                    @ped.Estado
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <form method="post" asp-page-handler="Eliminar" asp-route-id="@ped.Id"
-                                          onsubmit="return confirm('¿Deseas eliminar este pedido?');">
-                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
+    <!-- Tabla para Listar Pedidos -->
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Fecha Creación</th>
+                <th>Fecha Entrega</th>
+                <th>Estado</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.ListaPedidos != null && Model.ListaPedidos.Any())
+            {
+                @foreach (var ped in Model.ListaPedidos)
                 {
                     <tr>
-                        <td colspan="8" class="text-center text-muted">No hay pedidos registrados todavía.</td>
+                        <td>@ped.Id</td>
+                        <td>@ped.NombreCliente</td>
+                        <td>@ped.TelefonoCliente</td>
+                        <td>@ped.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@ped.FechaEntrega.ToString("dd/MM/yyyy")</td> <!-- Mostramos solo la fecha para mayor limpieza -->
+                        <td>
+                            <span class="badge bg-@(ped.Estado == "Completado" ? "success" : ped.Estado == "En Proceso" ? "warning" : "secondary")">
+                                @ped.Estado
+                            </span>
+                        </td>
+                        <td>$@ped.Total</td>
+                        <td>
+                            <form method="post" asp-page-handler="Eliminar" asp-route-id="@ped.Id"
+                                  onsubmit="return confirm('¿Deseas eliminar el pedido de @ped.NombreCliente?');" style="margin: 0;">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    </div>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center">No hay pedidos registrados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
